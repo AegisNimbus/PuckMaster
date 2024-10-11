@@ -1,4 +1,4 @@
- ## 🎮 PuckMaster 🏒
+ # 🎮 PuckMaster 🏒
 
 ![image](https://github.com/user-attachments/assets/eac37dc5-fae3-4e96-9704-c32ebcdb43c7)
 
