@@ -39,7 +39,7 @@ PuckMaster is a game project that spans multiple domains, offering a deep dive i
 
 ![image](https://github.com/user-attachments/assets/ba7b3822-edac-457d-9015-9dc4737d20ce)
 
-For PuckMaster, we harness a blend of tools and technologies to deliver an immersive and high-performance gaming experience:
+For **PuckMaster**, we harness a blend of tools and technologies to deliver an immersive and high-performance gaming experience:
 
 - **Game Development:** Python, Pygame – The core of PuckMaster is built using Python and Pygame for seamless game mechanics, real-time event handling, and graphical rendering. 🕹️
 - **Physics Simulation:** Pygame's collision detection and physics handling, supplemented by custom algorithms, allow for realistic puck movement and interactions. ⚙️
