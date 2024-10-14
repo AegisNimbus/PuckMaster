@@ -6,6 +6,7 @@ from startScreen import air_hockey_start, disp_text
 from themeScreen import theme_screen
 from globals import *
 from endScreen import game_end
+from leaderboard import update_leaderboard
 
 # Globals, initialized in method `init()`
 
@@ -390,12 +391,14 @@ def game_loop(speed, player1_color, player2_color, background_color, player_1_na
 
         # display endscreen or rounds
         if rounds_p1 == const.ROUND_LIMIT:  # Player one denotes left player
+            update_leaderboard(player_1_name, rounds_p1)
             if end(game_end(screen, clock, background_color, player_1_name), speed):
                 if music_paused:
                     pygame.mixer.music.unpause()
                 pygame.mixer.stop()
                 return
         elif rounds_p2 == const.ROUND_LIMIT:  # Player two denotes right player
+            update_leaderboard(player_2_name, rounds_p2)
             if end(game_end(screen, clock, background_color, player_2_name), speed):
                 if music_paused:
                     pygame.mixer.music.unpause()

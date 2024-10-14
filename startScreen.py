@@ -2,9 +2,13 @@ import sys
 import random
 from globals import *
 from constants import MUTE_BUTTON_RADIUS, INFO_BUTTON_RADIUS
+from leaderboard import get_leaderboard
 
 x = squareSide+30
 positionGrid = [145, 145+x, 145+2*x, 145+3*x+250, 145+4*x+250, 145+5*x+250]
+
+# Near the top of the file, add this new color definition if it doesn't exist
+BLUE = (0, 100, 255)  # A nice shade of blue
 
 # function to render font
 
@@ -17,10 +21,17 @@ def text_obj(text, font, color):
 # function to render interactive button
 
 
-def button_circle(screen, butt_color, button_pos, text, text_size, text_color,
-                  text_pos):
+def button_circle(screen, butt_color, button_pos, text, text_size, text_color, text_pos):
     pygame.draw.circle(screen, butt_color, button_pos, buttonRadius)
     text_surf, text_rect = text_obj(text, text_size, text_color)
+    
+    # Scale down the text if it's too wide for the button
+    if text_rect.width > buttonRadius * 1.8:
+        scale_factor = (buttonRadius * 1.8) / text_rect.width
+        new_font_size = int(text_size.get_height() * scale_factor)
+        new_font = pygame.font.Font(None, new_font_size)  # Use None to get the default font
+        text_surf, text_rect = text_obj(text, new_font, text_color)
+    
     text_rect.center = text_pos
     screen.blit(text_surf, text_rect)
 
@@ -120,6 +131,11 @@ def show_info(screen, scr_width, clock):
 
 
 def air_hockey_start(screen, clock, scr_width, scr_height, mute):
+    # Initialize fonts here
+    smallfont = pygame.font.SysFont("comicsans", 35)
+    large_text = pygame.font.Font('freesansbold.ttf', 50)
+    small_text = pygame.font.Font('freesansbold.ttf', 30)
+    leaderboard_font = pygame.font.Font('freesansbold.ttf', 25)  # Increased font size
 
     pygame.mixer.music.load(os.path.join(auxDirectory, 'StartScreenBack.mp3'))
     pygame.mixer.music.play(-1)
@@ -188,8 +204,6 @@ def air_hockey_start(screen, clock, scr_width, scr_height, mute):
 
         screen.fill((60, 90, 100))
         celeb_text = pygame.font.Font(os.path.join(auxDirectory, 'Jelly Crazies.ttf'), 70)
-        large_text = pygame.font.Font('freesansbold.ttf', 50)
-        small_text = pygame.font.Font('freesansbold.ttf', 30)
         color_x = random.randint(0, 4)
         color_y = random.randint(0, 1)
         disp_text(screen, "AIRHOCKEY", (scr_width / 2, 100), celeb_text, colors[color_x][color_y])
@@ -440,5 +454,43 @@ def air_hockey_start(screen, clock, scr_width, scr_height, mute):
                     pygame.display.flip()
                     clock.tick(10)
 
+        # Add a new button for the leaderboard
+        leaderboard_btn_x, leaderboard_btn_y = 800, 470
+        if abs(mouse[0] - leaderboard_btn_x) < buttonRadius and abs(mouse[1] - leaderboard_btn_y) < buttonRadius:
+            button_circle(screen, BLUE, (leaderboard_btn_x, leaderboard_btn_y), "Leaderboard", leaderboard_font, (255, 255, 255),
+                          (leaderboard_btn_x, leaderboard_btn_y))
+            if click[0] == 1:
+                show_leaderboard(screen, clock, scr_width, scr_height)
+        else:
+            button_circle(screen, (0, 70, 200), (leaderboard_btn_x, leaderboard_btn_y), "Leaderboard", leaderboard_font, (255, 255, 255),
+                          (leaderboard_btn_x, leaderboard_btn_y))
+
         pygame.display.update()
         clock.tick(10)
+
+# Add this function to display the leaderboard
+def show_leaderboard(screen, clock, width, height):
+    leaderboard = get_leaderboard()
+    font = pygame.font.Font('freesansbold.ttf', 30)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
+
+        screen.fill((60, 90, 100))
+        title = font.render("LEADERBOARD", True, const.WHITE)
+        screen.blit(title, (width / 2 - title.get_width() / 2, 50))
+
+        for i, entry in enumerate(leaderboard):
+            text = font.render(f"{i+1}. {entry['name']}: {entry['score']}", True, const.WHITE)
+            screen.blit(text, (width / 2 - text.get_width() / 2, 100 + i * 40))
+
+        back_text = font.render("Press ESC to go back", True, const.WHITE)
+        screen.blit(back_text, (width / 2 - back_text.get_width() / 2, height - 50))
+
+        pygame.display.flip()
+        clock.tick(30)
