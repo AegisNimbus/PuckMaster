@@ -15,8 +15,8 @@ Follow these steps to submit your first pull request (PR):
 4. If you've already forked the project, update your copy.
    git remote update
 5. Navigate to the project directory.
-   cd ML-Alchemy
-6. Set an upstream with the parent repository
+   cd PuckMaster
+7. Set an upstream with the parent repository
 
    git remote add upstream https://github.com/AegisNimbus/PuckMaster.git
 8. If necessary, rebase your copy
