@@ -7,6 +7,7 @@ from themeScreen import theme_screen
 from globals import *
 from endScreen import game_end
 from leaderboard import update_leaderboard
+from powerup import spawn_powerup, PowerUp
 
 # Globals, initialized in method `init()`
 
@@ -269,6 +270,11 @@ def game_loop(speed, player1_color, player2_color, background_color, player_1_na
         pygame.mixer.music.pause()
         music_paused = True
 
+    powerups = []
+    last_powerup_time = pygame.time.get_ticks()
+    powerup_interval = 15000  # 15 seconds
+    spawn_side = 0  # 0 for left side, 1 for right side
+
     while True:
         global score1, score2
 
@@ -313,6 +319,16 @@ def game_loop(speed, player1_color, player2_color, background_color, player_1_na
                         reset_game(speed, 1)
                         reset_game(speed, 2)
                         puck.angle = 0
+
+            elif event.type == pygame.USEREVENT:
+                paddle1.reset_speed()
+                paddle2.reset_speed()
+            elif event.type == pygame.USEREVENT + 1:
+                paddle1.reset_size()
+                paddle2.reset_size()
+            elif event.type == pygame.USEREVENT + 2:
+                paddle1.shield = False
+                paddle2.shield = False
 
         key_presses = pygame.key.get_pressed()
 
@@ -413,9 +429,43 @@ def game_loop(speed, player1_color, player2_color, background_color, player_1_na
         paddle2.draw(screen, player2_color)
         puck.draw(screen)
 
+        current_time = pygame.time.get_ticks()
+        if current_time - last_powerup_time > powerup_interval:
+            if spawn_side == 0:
+                new_powerup = spawn_powerup(width // 4, width // 2 - 100, height)  # Spawn on left side
+            else:
+                new_powerup = spawn_powerup(width // 2 + 100, width * 3 // 4, height)  # Spawn on right side
+            powerups.append(new_powerup)
+            last_powerup_time = current_time
+            spawn_side = 1 - spawn_side  # Toggle spawn side
+
+        for powerup in powerups[:]:
+            powerup.draw(screen)
+            if current_time - powerup.spawn_time > powerup.active_time:
+                powerups.remove(powerup)
+            elif not powerup.collected:
+                if paddle1.collides_with_powerup(powerup):
+                    apply_powerup(paddle1, powerup.type)
+                    powerup.collected = True
+                elif paddle2.collides_with_powerup(powerup):
+                    apply_powerup(paddle2, powerup.type)
+                    powerup.collected = True
+
         # refresh screen.
         pygame.display.flip()
         clock.tick(const.FPS)
+
+
+def apply_powerup(paddle, type):
+    if type == "speed":
+        paddle.set_speed(paddle.speed * 1.5)
+        pygame.time.set_timer(pygame.USEREVENT, 7000)  # Reset speed after 7 seconds
+    elif type == "size":
+        paddle.set_size(paddle.radius * 1.3)  # Increase size by 30%
+        pygame.time.set_timer(pygame.USEREVENT + 1, 7000)  # Reset size after 7 seconds
+    elif type == "shield":
+        paddle.shield = True
+        pygame.time.set_timer(pygame.USEREVENT + 2, 7000)  # Remove shield after 7 seconds
 
 
 if __name__ == "__main__":
