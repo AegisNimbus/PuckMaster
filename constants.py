@@ -53,3 +53,8 @@ PAUSE_BUTTON_RADIUS = 32
 
 # info button
 INFO_BUTTON_RADIUS = 32
+
+# ... new code ...
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)

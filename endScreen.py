@@ -5,13 +5,15 @@ import sys
 import os
 from startScreen import *
 from globals import *
+from leaderboard import get_leaderboard
+import pygame.gfxdraw
 
 # Game end screen function
 def game_end(screen, clock, background_color, player_name):
 
     celeb_text = pygame.font.Font(os.path.join(auxDirectory, 'MR ROBOT.ttf'), 140)
     large_text = pygame.font.Font('freesansbold.ttf', 45)
-    small_text = pygame.font.Font('freesansbold.ttf', 30)
+    small_text = pygame.font.Font('freesansbold.ttf', 20)
 
     while True:
 
@@ -82,5 +84,18 @@ def game_end(screen, clock, background_color, player_name):
             button_circle(screen, colors[1][0], (1000, 470), "Quit", small_text, (255, 255, 255),
                           (width / 2 + 400, height / 2 + 170))
 
+        # Draw the leaderboard
+        draw_leaderboard(screen, small_text)
+
         pygame.display.update()
         clock.tick(10)
+
+# Add this function to draw the leaderboard
+def draw_leaderboard(screen, font):
+    leaderboard = get_leaderboard()
+    title = font.render("LEADERBOARD", True, const.WHITE)
+    screen.blit(title, (width / 2 - title.get_width() / 2, 100))
+
+    for i, entry in enumerate(leaderboard):
+        text = font.render(f"{i+1}. {entry['name']}: {entry['score']}", True, const.WHITE)
+        screen.blit(text, (width / 2 - text.get_width() / 2, 150 + i * 30))
